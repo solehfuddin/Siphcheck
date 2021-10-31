@@ -1,4 +1,4 @@
-package com.sofudev.sipphcheck
+package com.sofudev.sipphcheck.ui
 
 import android.Manifest
 import android.app.Activity
@@ -21,6 +21,8 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.sofudev.sipphcheck.BaseActivity
+import com.sofudev.sipphcheck.R
 import com.sofudev.sipphcheck.adapter.ColorAdapter
 import com.sofudev.sipphcheck.database.ColorViewModel
 import com.sofudev.sipphcheck.dialog.ColorDetailDialog
@@ -53,13 +55,11 @@ class CameraActivity : BaseActivity() {
         ProcessCameraProvider.getInstance(this)
     }
 
-    // Used to bind the lifecycle of cameras to the lifecycle owner
     private val cameraProvider by lazy {
         cameraProviderFuture.get()
     }
     private var isBackCamera = true
 
-    // Select back camera as a default
     private var cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
 
     private val colorDetectHandler = ColorDetectHandler()
@@ -136,11 +136,11 @@ class CameraActivity : BaseActivity() {
             }
         }
 
-        btn_pick_image.setOnClickListener {
-            val intent = Intent(Intent.ACTION_PICK)
-            intent.type = "image/*"
-            startActivityForResult(intent, REQUEST_CODE)
-        }
+//        btn_pick_image.setOnClickListener {
+//            val intent = Intent(Intent.ACTION_PICK)
+//            intent.type = "image/*"
+//            startActivityForResult(intent, REQUEST_CODE)
+//        }
 
         btn_show_camera.setOnClickListener {
             if (isImageShown) {
@@ -248,22 +248,6 @@ class CameraActivity : BaseActivity() {
                 image_view.setImageURI(data.data)
                 startDetectColorFromImage(decodeUriToBitmap(data.data!!))
             }
-
-
-            /*   Glide.with(this)
-                   .asBitmap()
-                   .load(data?.data)
-                   .into(object : CustomTarget<Bitmap>() {
-                       override fun onResourceReady(
-                           resource: Bitmap,
-                           transition: Transition<in Bitmap>?
-                       ) {
-                           image_view.setImageBitmap(resource)
-                           startDetectColorFromImage(resource)
-                       }
-
-                       override fun onLoadCleared(placeholder: Drawable?) = Unit
-                   })*/
         }
     }
 
@@ -273,18 +257,7 @@ class CameraActivity : BaseActivity() {
 
         timerTask?.cancel()
 
-        /*  For debugging
-          val w = image_view.width
-          val h = image_view.height
-          */
-
-        // Set Pointer Coordinates at center of image view
         setPointerCoordinates(image_view.width / 2f, image_view.height / 2f)
-
-        /**
-         * At this point I don't know how to explain  this code.
-         * But I will definitely add it in the future
-         */
 
         var isFitHorizontally = true
 
@@ -317,8 +290,6 @@ class CameraActivity : BaseActivity() {
                 card_color.setCardBackgroundColor(Color.parseColor(currentColor.hex))
             }
         }
-
-
     }
 
     override fun onRequestPermissionsResult(
