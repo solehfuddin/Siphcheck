@@ -22,4 +22,8 @@
     <string name="password">Password</string>
     <string name="login">Login</string>
     <string name="take_picture">Take Picture</string>
+    <string name="harap_login">Please, Sign In</string>
+    <string name="type_your_name">type your name</string>
+    <string name="type_password">******</string>
+    <string name="logout">Logout</string>
 </resources>
