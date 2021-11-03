@@ -26,4 +26,8 @@
     <string name="type_your_name">type your name</string>
     <string name="type_password">******</string>
     <string name="logout">Logout</string>
+    <string name="list_pengujian">List Pengujian</string>
+    <string name="kadar_ph">Kadar pH :</string>
+    <string name="kategori_ph">Kategori pH :</string>
+    <string name="tgl_pengujian">Tgl pengujian</string>
 </resources>

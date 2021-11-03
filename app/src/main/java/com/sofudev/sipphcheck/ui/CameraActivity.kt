@@ -19,17 +19,15 @@ import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.sofudev.sipphcheck.BaseActivity
 import com.sofudev.sipphcheck.R
 import com.sofudev.sipphcheck.adapter.ColorAdapter
-import com.sofudev.sipphcheck.database.ColorViewModel
 import com.sofudev.sipphcheck.dialog.ColorDetailDialog
-import com.sofudev.sipphcheck.dialog.ColorDialog
 import com.sofudev.sipphcheck.fragment.ColorsFragment
 import com.sofudev.sipphcheck.handler.ColorDetectHandler
 import com.sofudev.sipphcheck.model.UserColor
+import com.sofudev.sipphcheck.utils.Fuzzy
 import com.sofudev.sipphcheck.utils.timer
 import kotlinx.android.synthetic.main.activity_camera.*
 import kotlinx.coroutines.CoroutineScope
@@ -70,6 +68,8 @@ class CameraActivity : BaseActivity() {
 
     private var isImageShown = false
 
+    private var fuzzy : Fuzzy? = null
+
     private var currentColorList: MutableList<UserColor> =
         mutableListOf()
 
@@ -82,12 +82,6 @@ class CameraActivity : BaseActivity() {
 
     private val colorsFragment: ColorsFragment by lazy {
         ColorsFragment()
-    }
-    private val colorViewModel: ColorViewModel by lazy {
-        ViewModelProvider(
-            this,
-            ColorViewModel.ColorViewModelFactory(application)
-        )[ColorViewModel::class.java]
     }
 
     override fun getLayoutId(): Int = R.layout.activity_camera
@@ -116,12 +110,6 @@ class CameraActivity : BaseActivity() {
         btn_pick_color.setOnClickListener {
             addColor()
         }
-        btn_add_list_color.setOnClickListener {
-            if (currentColorList.isNotEmpty()) {
-                val colorDialog = ColorDialog(this, colorViewModel, colorAdapter, clearColorList)
-                colorDialog.show()
-            }
-        }
 
         btn_change_camera.setOnClickListener {
             if (!isImageShown) {
@@ -135,12 +123,6 @@ class CameraActivity : BaseActivity() {
                 startCamera()
             }
         }
-
-//        btn_pick_image.setOnClickListener {
-//            val intent = Intent(Intent.ACTION_PICK)
-//            intent.type = "image/*"
-//            startActivityForResult(intent, REQUEST_CODE)
-//        }
 
         btn_show_camera.setOnClickListener {
             if (isImageShown) {
@@ -327,6 +309,15 @@ class CameraActivity : BaseActivity() {
             currentColorList.add(0, currentColor)
 
             colorAdapter.notifyData(currentColorList)
+
+            Log.d(CameraActivity::class.java.simpleName, "RGB(${currentColor.r}, ${currentColor.g}, ${currentColor.b})")
+            fuzzy = Fuzzy(currentColor.r.toInt(), currentColor.g.toInt(), currentColor.b.toInt())
+            val output = fuzzy?.checkRange()
+            val status = fuzzy?.checkStatus()
+
+            Toast.makeText(this, output, Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, status, Toast.LENGTH_SHORT).show()
+//            Toast.makeText(this, "RGB(${currentColor.r}, ${currentColor.g}, ${currentColor.b})", Toast.LENGTH_SHORT).show()
         } catch (e: IllegalArgumentException) {
             Toast.makeText(
                 this,
@@ -334,11 +325,6 @@ class CameraActivity : BaseActivity() {
                 Toast.LENGTH_SHORT
             ).show()
         }
-    }
-
-    private val clearColorList: () -> Unit = {
-        currentColorList.clear()
-        colorAdapter.notifyData(currentColorList)
     }
 
     private fun showBottomSheetFragment() {

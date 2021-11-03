@@ -4,7 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 
 class PrefManager(var context: Context) {
-    val PRIVATE_MODE = 0
+    private val PRIVATE_MODE = 0
 
     private val PREF_NAME = "sharedPref"
     private val IS_LOGIN = "is_login"

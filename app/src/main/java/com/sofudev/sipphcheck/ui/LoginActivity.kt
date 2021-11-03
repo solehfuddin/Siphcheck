@@ -2,6 +2,7 @@ package com.sofudev.sipphcheck.ui
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import android.widget.Toast
 import com.android.volley.Request
 import com.android.volley.toolbox.JsonObjectRequest
@@ -18,7 +19,7 @@ class LoginActivity : BaseActivity() {
     private lateinit var prefManager: PrefManager
 
     override fun initControls(savedInstanceState: Bundle?) {
-
+        loading.visibility = View.GONE
     }
 
     override fun initEvents() {
@@ -26,6 +27,9 @@ class LoginActivity : BaseActivity() {
         checkLogin()
 
         button_login.setOnClickListener {
+            loading.visibility = View.VISIBLE
+            button_login.isEnabled = false
+
             val urlLogin = "https://timurrayalab.com/salesapi/User/loginUser"
             val username = edit_username.text.toString().trim()
             val password = edit_password.text.toString().trim()
@@ -45,6 +49,9 @@ class LoginActivity : BaseActivity() {
                 urlLogin,
                 postData,
                 {
+                    loading.visibility = View.GONE
+                    button_login.isEnabled = true
+
                     try {
                         println(it)
                         val code = it.getInt("code")
