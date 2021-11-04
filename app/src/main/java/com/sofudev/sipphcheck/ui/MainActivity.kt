@@ -10,24 +10,20 @@ import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import com.sofudev.sipphcheck.BaseActivity
 import com.sofudev.sipphcheck.R
-import com.sofudev.sipphcheck.adapter.ColorAdapter
+import com.sofudev.sipphcheck.adapter.ColorListAdapter
 import com.sofudev.sipphcheck.adapter.DataInputAdapter
+import com.sofudev.sipphcheck.dialog.ColorDetailDialog
 import com.sofudev.sipphcheck.model.DataInput
-import com.sofudev.sipphcheck.model.UserColor
 import com.sofudev.sipphcheck.session.PrefManager
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.launch
+import kotlinx.android.synthetic.main.fragment_colors.*
 import org.json.JSONException
 import org.json.JSONObject
 
 class MainActivity : BaseActivity() {
     private lateinit var prefManager: PrefManager
-    private val recyclerView: RecyclerView = findViewById(R.id.recyclerview)
+    private val dataList : ArrayList<DataInput> = ArrayList()
+    private val adapter = DataInputAdapter(this, dataList)
 
     override fun initControls(savedInstanceState: Bundle?) {
         loading.visibility = View.GONE
@@ -37,6 +33,11 @@ class MainActivity : BaseActivity() {
         prefManager = PrefManager(this)
         checkLogin()
         checkData()
+
+        val layoutManager = LinearLayoutManager(this)
+        recyclerview.layoutManager = layoutManager
+        recyclerview.setHasFixedSize(true)
+        recyclerview.adapter = adapter
 
         fab_camera.setOnClickListener {
             val intent = Intent(this, CameraActivity::class.java)
@@ -83,19 +84,29 @@ class MainActivity : BaseActivity() {
                     println(it)
                     val code = it.getInt("code")
 
-                    if (code == 200)
-                    {
+                    if (code == 200) {
                         val jsonArray = it.getJSONArray("data")
+                        for (i in 0 until jsonArray.length()) {
+                            val `object` = jsonArray.getJSONObject(i)
+                            val dataInput = DataInput(
+                                `object`.getString("id_input"),
+                                `object`.getString("kode_warna"),
+                                `object`.getString("kode_ph"),
+                                `object`.getString("kategori_ph"),
+                                `object`.getString("tgl_input")
+                            )
 
-                    }
-                    else
-                    {
+                            dataList.add(dataInput)
+                        }
+                    } else {
                         img_notfound.visibility = View.VISIBLE
                         recyclerview.visibility = View.GONE
                     }
-                }catch (e: JSONException){
+                } catch (e: JSONException) {
                     e.printStackTrace()
                 }
+
+                adapter.notifyDataSetChanged()
             },
             { error ->
                 error.printStackTrace()

@@ -11,10 +11,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.sofudev.sipphcheck.R
 import com.sofudev.sipphcheck.model.DataInput
 
-class DataInputAdapter(private val context: Context) :
+class DataInputAdapter(private val context: Context, private val dataInput: List<DataInput>) :
     RecyclerView.Adapter<DataInputAdapter.DataInputViewHolder>(){
-
-    private var dataInput: List<DataInput> = listOf()
 
     @SuppressLint("SetTextI18n")
     inner class DataInputViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -27,7 +25,7 @@ class DataInputAdapter(private val context: Context) :
             txtKadar.text = "Kadar pH : ${item.kodePh}"
             txtKategori.text = "Kategori pH : ${item.kategoriPh}"
             txtTanggal.text = item.tglInput
-            viewKode.setBackgroundColor(Color.parseColor("{${item.kodeWarna}}"))
+            viewKode.setBackgroundColor(Color.parseColor(item.kodeWarna))
         }
     }
 
