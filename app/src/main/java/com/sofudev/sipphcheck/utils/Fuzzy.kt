@@ -31,29 +31,29 @@ class Fuzzy(private val r : Int, private val g : Int, private val b : Int) {
         }
 
         return when{
-            ph1 -> "Kadar Ph 1"
-            ph2 -> "Kadar Ph 2"
-            else -> "Kadar Ph tidak ditemukan"
+            ph1 -> "1"
+            ph2 -> "2"
+            else -> "0"
         }
     }
 
     fun checkStatus() : String {
         return when(init){
-            1 -> "Kategori pH Acid"
-            2 -> "Kategori pH Acid"
-            3 -> "Kategori pH Acid"
-            4 -> "Kategori pH Acid"
-            5 -> "Kategori pH Acid"
-            6 -> "Kategori pH Acid"
-            7 -> "Kategori pH Netral"
-            8 -> "Kategori pH Alkaline"
-            9 -> "Kategori pH Alkaline"
-            10 -> "Kategori pH Alkaline"
-            11 -> "Kategori pH Alkaline"
-            12 -> "Kategori pH Alkaline"
-            13 -> "Kategori pH Alkaline"
-            14 -> "Kategori pH Alkaline"
-            else -> "Kategori pH tidak ditemukan"
+            1 -> "Acid"
+            2 -> "Acid"
+            3 -> "Acid"
+            4 -> "Acid"
+            5 -> "Acid"
+            6 -> "Acid"
+            7 -> "Netral"
+            8 -> "Alkaline"
+            9 -> "Alkaline"
+            10 -> "Alkaline"
+            11 -> "Alkaline"
+            12 -> "Alkaline"
+            13 -> "Alkaline"
+            14 -> "Alkaline"
+            else -> "Tidak ditemukan"
         }
     }
 

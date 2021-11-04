@@ -1,22 +1,19 @@
 package com.sofudev.sipphcheck.ui
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.Request
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import com.sofudev.sipphcheck.BaseActivity
 import com.sofudev.sipphcheck.R
-import com.sofudev.sipphcheck.adapter.ColorListAdapter
 import com.sofudev.sipphcheck.adapter.DataInputAdapter
-import com.sofudev.sipphcheck.dialog.ColorDetailDialog
 import com.sofudev.sipphcheck.model.DataInput
 import com.sofudev.sipphcheck.session.PrefManager
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.fragment_colors.*
 import org.json.JSONException
 import org.json.JSONObject
 
@@ -52,6 +49,11 @@ class MainActivity : BaseActivity() {
         }
     }
 
+    override fun onRestart() {
+        super.onRestart()
+        checkData()
+    }
+
     override fun getLayoutId(): Int = R.layout.activity_main
 
     private fun checkLogin(){
@@ -62,7 +64,9 @@ class MainActivity : BaseActivity() {
         }
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private fun checkData(){
+        dataList.clear()
         val url = "https://timurrayalab.com/salesapi/Input/getData"
 
         val requestQueue = Volley.newRequestQueue(this)

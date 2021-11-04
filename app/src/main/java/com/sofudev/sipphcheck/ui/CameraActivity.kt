@@ -20,6 +20,9 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.android.volley.Request
+import com.android.volley.toolbox.JsonObjectRequest
+import com.android.volley.toolbox.Volley
 import com.sofudev.sipphcheck.BaseActivity
 import com.sofudev.sipphcheck.R
 import com.sofudev.sipphcheck.adapter.ColorAdapter
@@ -27,6 +30,7 @@ import com.sofudev.sipphcheck.dialog.ColorDetailDialog
 import com.sofudev.sipphcheck.fragment.ColorsFragment
 import com.sofudev.sipphcheck.handler.ColorDetectHandler
 import com.sofudev.sipphcheck.model.UserColor
+import com.sofudev.sipphcheck.session.PrefManager
 import com.sofudev.sipphcheck.utils.Fuzzy
 import com.sofudev.sipphcheck.utils.timer
 import kotlinx.android.synthetic.main.activity_camera.*
@@ -34,10 +38,13 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.withContext
+import org.json.JSONException
+import org.json.JSONObject
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 class CameraActivity : BaseActivity() {
+    private lateinit var prefManager: PrefManager
 
     companion object {
         private const val TAG = "CameraXBasic"
@@ -106,7 +113,7 @@ class CameraActivity : BaseActivity() {
 
 
     override fun initEvents() {
-
+        prefManager = PrefManager(this)
         btn_pick_color.setOnClickListener {
             addColor()
         }
@@ -315,8 +322,7 @@ class CameraActivity : BaseActivity() {
             val output = fuzzy?.checkRange()
             val status = fuzzy?.checkStatus()
 
-            Toast.makeText(this, output, Toast.LENGTH_SHORT).show()
-            Toast.makeText(this, status, Toast.LENGTH_SHORT).show()
+            insertData(currentColor.hex, output, status)
 //            Toast.makeText(this, "RGB(${currentColor.r}, ${currentColor.g}, ${currentColor.b})", Toast.LENGTH_SHORT).show()
         } catch (e: IllegalArgumentException) {
             Toast.makeText(
@@ -349,5 +355,48 @@ class CameraActivity : BaseActivity() {
     } catch (e: Exception) {
         e.printStackTrace()
         (image_view.drawable as BitmapDrawable).bitmap
+    }
+
+    private fun insertData(kdWarna: String, kdPh: String?, katPh: String?){
+        val url = "https://timurrayalab.com/salesapi/Input/insertData"
+
+        val requestQueue = Volley.newRequestQueue(this)
+
+        val postData = JSONObject()
+        try {
+            postData.put("id_user", prefManager.getIdUser())
+            postData.put("kode_warna", kdWarna)
+            postData.put("kode_ph", kdPh)
+            postData.put("kategori_ph", katPh)
+        } catch (e: JSONException) {
+            e.printStackTrace()
+        }
+
+        val jsonObjectRequest = JsonObjectRequest(
+            Request.Method.POST,
+            url,
+            postData,
+            {
+                try {
+                    println(it)
+                    val code = it.getInt("code")
+
+                    if (code == 200) {
+                        Toast.makeText(this, "Data berhasil disimpan", Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(this, "Gagal menyimpan data", Toast.LENGTH_SHORT).show()
+                    }
+                } catch (e: JSONException) {
+                    e.printStackTrace()
+                }
+
+                finish()
+            },
+            { error ->
+                error.printStackTrace()
+            })
+
+        requestQueue.cache.clear()
+        requestQueue.add(jsonObjectRequest)
     }
 }
