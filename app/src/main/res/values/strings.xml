@@ -27,7 +27,11 @@
     <string name="type_password">******</string>
     <string name="logout">Logout</string>
     <string name="list_pengujian">List Pengujian</string>
-    <string name="kadar_ph">Kadar pH :</string>
+    <string name="kadar_ph">Kadar pH</string>
     <string name="kategori_ph">Kategori pH :</string>
     <string name="tgl_pengujian">Tgl pengujian</string>
+    <string name="title_dashboard">Mengecek kadar air kolam renang sangatlah penting untuk menjaga kualitas air kolam agar selalu stabil. Kualitas air yang stabil yaitu jika air memiliki kadah pH yang ideal. Selain itu, kolam juga harus selalu bersih dan juga jernih. \n Ayo cek pH air dengan CEK PH!</string>
+    <string name="cek_ph_air">Cek pH air</string>
+    <string name="hasil_cek_ph">Hasil cek pH</string>
+    <string name="nama_user">Nama user</string>
 </resources>
