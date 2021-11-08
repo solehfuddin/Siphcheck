@@ -33,6 +33,7 @@ import com.sofudev.sipphcheck.adapter.ColorAdapter
 import com.sofudev.sipphcheck.dialog.ColorDetailDialog
 import com.sofudev.sipphcheck.fragment.ColorsFragment
 import com.sofudev.sipphcheck.handler.ColorDetectHandler
+import com.sofudev.sipphcheck.model.MyColor
 import com.sofudev.sipphcheck.model.UserColor
 import com.sofudev.sipphcheck.session.PrefManager
 import com.sofudev.sipphcheck.utils.DateConvert
@@ -56,6 +57,7 @@ import org.json.JSONObject
 import java.util.*
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+import kotlin.collections.ArrayList
 
 class CameraActivity : BaseActivity() {
     private lateinit var prefManager: PrefManager
@@ -333,8 +335,29 @@ class CameraActivity : BaseActivity() {
 
             Log.d(CameraActivity::class.java.simpleName, "RGB(${currentColor.r}, ${currentColor.g}, ${currentColor.b})")
             fuzzy = Fuzzy(currentColor.r.toInt(), currentColor.g.toInt(), currentColor.b.toInt())
-            val output = fuzzy?.checkRange()
-            val status = fuzzy?.checkStatus()
+
+            val colorArr : ArrayList<MyColor> = ArrayList()
+            colorArr.add(MyColor(185, 13, 23))
+            colorArr.add(MyColor(205, 44, 30))
+            colorArr.add(MyColor(193, 38, 20))
+            colorArr.add(MyColor(212, 84, 25))
+            colorArr.add(MyColor(215, 120, 30))
+            colorArr.add(MyColor(215, 130, 38))
+            colorArr.add(MyColor(180, 123, 29))
+            colorArr.add(MyColor(60, 49, 0))
+            colorArr.add(MyColor(40, 36, 0))
+            colorArr.add(MyColor(25, 10, 16))
+            colorArr.add(MyColor(25, 0, 0))
+            colorArr.add(MyColor(5, 0, 0))
+            colorArr.add(MyColor(60, 0, 0))
+            colorArr.add(MyColor(18, 0, 0))
+
+            val getNear = fuzzy?.findNearest(colorArr,
+                MyColor(currentColor.r.toInt(), currentColor.g.toInt(), currentColor.b.toInt()))
+
+            Log.d(TAG, "Nearest index : $getNear")
+            val output = getNear.toString()
+            val status = fuzzy?.checkStatus(getNear!!)
 
             insertData(currentColor.hex, output, status)
             showDialog(currentColor.hex, output, status)
