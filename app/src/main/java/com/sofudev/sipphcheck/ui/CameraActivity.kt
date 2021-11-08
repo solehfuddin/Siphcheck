@@ -1,7 +1,9 @@
 package com.sofudev.sipphcheck.ui
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.Dialog
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -13,6 +15,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
+import android.view.Window
 import android.widget.Toast
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.Preview
@@ -23,6 +26,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.android.volley.Request
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
+import com.archit.calendardaterangepicker.customviews.CalendarListener
 import com.sofudev.sipphcheck.BaseActivity
 import com.sofudev.sipphcheck.R
 import com.sofudev.sipphcheck.adapter.ColorAdapter
@@ -31,15 +35,25 @@ import com.sofudev.sipphcheck.fragment.ColorsFragment
 import com.sofudev.sipphcheck.handler.ColorDetectHandler
 import com.sofudev.sipphcheck.model.UserColor
 import com.sofudev.sipphcheck.session.PrefManager
+import com.sofudev.sipphcheck.utils.DateConvert
 import com.sofudev.sipphcheck.utils.Fuzzy
 import com.sofudev.sipphcheck.utils.timer
 import kotlinx.android.synthetic.main.activity_camera.*
+import kotlinx.android.synthetic.main.activity_camera.txt_hex
+import kotlinx.android.synthetic.main.activity_detail.*
+import kotlinx.android.synthetic.main.dialog_color_detail.*
+import kotlinx.android.synthetic.main.dialog_color_detail.btn_cancel
+import kotlinx.android.synthetic.main.dialog_color_detail.btn_remove_color
+import kotlinx.android.synthetic.main.dialog_color_detail.view_color_preview
+import kotlinx.android.synthetic.main.dialog_date_range.*
+import kotlinx.android.synthetic.main.dialog_new_detail.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.withContext
 import org.json.JSONException
 import org.json.JSONObject
+import java.util.*
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
@@ -323,6 +337,7 @@ class CameraActivity : BaseActivity() {
             val status = fuzzy?.checkStatus()
 
             insertData(currentColor.hex, output, status)
+            showDialog(currentColor.hex, output, status)
 //            Toast.makeText(this, "RGB(${currentColor.r}, ${currentColor.g}, ${currentColor.b})", Toast.LENGTH_SHORT).show()
         } catch (e: IllegalArgumentException) {
             Toast.makeText(
@@ -331,6 +346,28 @@ class CameraActivity : BaseActivity() {
                 Toast.LENGTH_SHORT
             ).show()
         }
+    }
+
+    private fun showDialog(kodeWarna: String, kodePh: String?, katPh: String?) {
+        val dialog = Dialog(this)
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setCancelable(false)
+        dialog.setContentView(R.layout.dialog_new_detail)
+
+        dialog.view_color_preview.setBackgroundColor(Color.parseColor(kodeWarna))
+
+        dialog.txt_hex.text = ("Hex : $kodeWarna")
+        dialog.txt_kadar.text = ("Kadar pH : $kodePh")
+        dialog.txt_ket.text = ("Kategori pH : $katPh")
+
+        dialog.btn_remove_color.visibility = View.INVISIBLE
+
+        dialog.btn_cancel.setOnClickListener {
+            dialog.dismiss()
+            finish()
+        }
+
+        dialog.show()
     }
 
     private fun showBottomSheetFragment() {
@@ -389,8 +426,6 @@ class CameraActivity : BaseActivity() {
                 } catch (e: JSONException) {
                     e.printStackTrace()
                 }
-
-                finish()
             },
             { error ->
                 error.printStackTrace()

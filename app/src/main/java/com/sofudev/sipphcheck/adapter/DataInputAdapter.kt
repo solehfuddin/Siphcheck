@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.sofudev.sipphcheck.R
 import com.sofudev.sipphcheck.model.DataInput
 import com.sofudev.sipphcheck.model.UserColor
+import com.sofudev.sipphcheck.utils.DateConvert
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -40,15 +41,18 @@ class DataInputAdapter(private val context: Context, private val dataInput: List
 //            txtTanggal.text = item.tglInput
 //            viewKode.setBackgroundColor(Color.parseColor(item.kodeWarna))
 
-            var formattedDate : String? = null
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                val parsedDate = LocalDateTime.parse(item.tglInput, DateTimeFormatter.ISO_DATE_TIME)
-                formattedDate = parsedDate.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))
-            } else {
-                val parser =  SimpleDateFormat("yyyy-MM-dd")
-                val formatter = SimpleDateFormat("dd-MM-yyyy")
-                formattedDate = formatter.format(parser.parse(item.tglInput))
-            }
+//            var formattedDate : String? = null
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//                val parsedDate = LocalDateTime.parse(item.tglInput, DateTimeFormatter.ISO_DATE_TIME)
+//                formattedDate = parsedDate.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))
+//            } else {
+//                val parser =  SimpleDateFormat("yyyy-MM-dd")
+//                val formatter = SimpleDateFormat("dd-MM-yyyy")
+//                formattedDate = formatter.format(parser.parse(item.tglInput))
+//            }
+
+            val converter = DateConvert()
+            val formattedDate = converter.convertToDate(item.tglInput)
 
             txtNama.text = item.namaUser
             txtKadar.text = item.kodePh
