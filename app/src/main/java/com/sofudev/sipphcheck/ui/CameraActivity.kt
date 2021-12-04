@@ -1,7 +1,6 @@
 package com.sofudev.sipphcheck.ui
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Dialog
 import android.content.Intent
@@ -26,7 +25,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.android.volley.Request
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
-import com.archit.calendardaterangepicker.customviews.CalendarListener
 import com.sofudev.sipphcheck.BaseActivity
 import com.sofudev.sipphcheck.R
 import com.sofudev.sipphcheck.adapter.ColorAdapter
@@ -36,17 +34,13 @@ import com.sofudev.sipphcheck.handler.ColorDetectHandler
 import com.sofudev.sipphcheck.model.MyColor
 import com.sofudev.sipphcheck.model.UserColor
 import com.sofudev.sipphcheck.session.PrefManager
-import com.sofudev.sipphcheck.utils.DateConvert
 import com.sofudev.sipphcheck.utils.Fuzzy
 import com.sofudev.sipphcheck.utils.timer
 import kotlinx.android.synthetic.main.activity_camera.*
 import kotlinx.android.synthetic.main.activity_camera.txt_hex
-import kotlinx.android.synthetic.main.activity_detail.*
-import kotlinx.android.synthetic.main.dialog_color_detail.*
 import kotlinx.android.synthetic.main.dialog_color_detail.btn_cancel
 import kotlinx.android.synthetic.main.dialog_color_detail.btn_remove_color
 import kotlinx.android.synthetic.main.dialog_color_detail.view_color_preview
-import kotlinx.android.synthetic.main.dialog_date_range.*
 import kotlinx.android.synthetic.main.dialog_new_detail.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -54,10 +48,8 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.withContext
 import org.json.JSONException
 import org.json.JSONObject
-import java.util.*
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
-import kotlin.collections.ArrayList
 
 class CameraActivity : BaseActivity() {
     private lateinit var prefManager: PrefManager
@@ -334,26 +326,9 @@ class CameraActivity : BaseActivity() {
             colorAdapter.notifyData(currentColorList)
 
             Log.d(CameraActivity::class.java.simpleName, "RGB(${currentColor.r}, ${currentColor.g}, ${currentColor.b})")
-            fuzzy = Fuzzy(currentColor.r.toInt(), currentColor.g.toInt(), currentColor.b.toInt())
+            fuzzy = Fuzzy()
 
-            val colorArr : ArrayList<MyColor> = ArrayList()
-            colorArr.add(MyColor(185, 13, 23))
-            colorArr.add(MyColor(205, 44, 30))
-            colorArr.add(MyColor(193, 38, 20))
-            colorArr.add(MyColor(212, 84, 25))
-            colorArr.add(MyColor(215, 120, 30))
-            colorArr.add(MyColor(215, 130, 38))
-            colorArr.add(MyColor(180, 123, 29))
-            colorArr.add(MyColor(60, 49, 0))
-            colorArr.add(MyColor(40, 36, 0))
-            colorArr.add(MyColor(25, 10, 16))
-            colorArr.add(MyColor(25, 0, 0))
-            colorArr.add(MyColor(5, 0, 0))
-            colorArr.add(MyColor(60, 0, 0))
-            colorArr.add(MyColor(18, 0, 0))
-
-            val getNear = fuzzy?.findNearest(colorArr,
-                MyColor(currentColor.r.toInt(), currentColor.g.toInt(), currentColor.b.toInt()))
+            val getNear = fuzzy?.findNearest(MyColor(currentColor.r.toInt(), currentColor.g.toInt(), currentColor.b.toInt()))
 
             Log.d(TAG, "Nearest index : $getNear")
             val output = getNear.toString()

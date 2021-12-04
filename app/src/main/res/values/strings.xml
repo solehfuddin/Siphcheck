@@ -34,4 +34,5 @@
     <string name="cek_ph_air">Cek pH air</string>
     <string name="hasil_cek_ph">Hasil cek pH</string>
     <string name="nama_user">Nama user</string>
+    <string name="riwayat_pengujian_terbaru">Riwayat Pengujian Terbaru</string>
 </resources>
