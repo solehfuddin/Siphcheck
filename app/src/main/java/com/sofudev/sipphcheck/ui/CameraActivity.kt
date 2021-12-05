@@ -23,6 +23,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.android.volley.Request
+import com.android.volley.Response
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import com.sofudev.sipphcheck.BaseActivity
@@ -34,7 +35,9 @@ import com.sofudev.sipphcheck.handler.ColorDetectHandler
 import com.sofudev.sipphcheck.model.MyColor
 import com.sofudev.sipphcheck.model.UserColor
 import com.sofudev.sipphcheck.session.PrefManager
+import com.sofudev.sipphcheck.utils.FileDataPart
 import com.sofudev.sipphcheck.utils.Fuzzy
+import com.sofudev.sipphcheck.utils.VolleyFileUploadRequest
 import com.sofudev.sipphcheck.utils.timer
 import kotlinx.android.synthetic.main.activity_camera.*
 import kotlinx.android.synthetic.main.activity_camera.txt_hex
@@ -48,6 +51,11 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.withContext
 import org.json.JSONException
 import org.json.JSONObject
+import java.io.IOException
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
@@ -84,6 +92,10 @@ class CameraActivity : BaseActivity() {
     private var isImageShown = false
 
     private var fuzzy : Fuzzy? = null
+
+    private var imageData: ByteArray? = null
+
+    private var dialogLoading : Dialog? = null
 
     private var currentColorList: MutableList<UserColor> =
         mutableListOf()
@@ -123,7 +135,13 @@ class CameraActivity : BaseActivity() {
     override fun initEvents() {
         prefManager = PrefManager(this)
         btn_pick_color.setOnClickListener {
-            addColor()
+            addColor(isImageShown)
+        }
+
+        btn_pick_image.setOnClickListener {
+            val intent = Intent(Intent.ACTION_PICK)
+            intent.type = "image/*"
+            startActivityForResult(intent, REQUEST_CODE)
         }
 
         btn_change_camera.setOnClickListener {
@@ -243,6 +261,7 @@ class CameraActivity : BaseActivity() {
             }
             if (data?.data != null) {
                 image_view.setImageURI(data.data)
+                createImageData(data.data!!)
                 startDetectColorFromImage(decodeUriToBitmap(data.data!!))
             }
         }
@@ -315,7 +334,7 @@ class CameraActivity : BaseActivity() {
     }
 
 
-    private fun addColor() {
+    private fun addColor(imageShow: Boolean) {
         try {
             //Check color before add to list
             Color.parseColor(currentColor.hex)
@@ -334,8 +353,17 @@ class CameraActivity : BaseActivity() {
             val output = getNear.toString()
             val status = fuzzy?.checkStatus(getNear!!)
 
-            insertData(currentColor.hex, output, status)
-            showDialog(currentColor.hex, output, status)
+            if (imageShow)
+            {
+                showLoading()
+                uploadImage(currentColor.hex, output, status)
+            }
+            else
+            {
+                insertData(currentColor.hex, output, status)
+                showDialog(currentColor.hex, output, status)
+            }
+
 //            Toast.makeText(this, "RGB(${currentColor.r}, ${currentColor.g}, ${currentColor.b})", Toast.LENGTH_SHORT).show()
         } catch (e: IllegalArgumentException) {
             Toast.makeText(
@@ -368,6 +396,24 @@ class CameraActivity : BaseActivity() {
         dialog.show()
     }
 
+    private fun showLoading() {
+        dialogLoading = Dialog(this)
+        dialogLoading!!.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialogLoading!!.setCancelable(false)
+        dialogLoading!!.setContentView(R.layout.dialog_loading)
+
+        dialogLoading!!.btn_cancel.setOnClickListener {
+            dialogLoading!!.dismiss()
+            finish()
+        }
+
+        dialogLoading!!.show()
+    }
+
+    private fun hideLoading(){
+        dialogLoading!!.dismiss()
+    }
+
     private fun showBottomSheetFragment() {
         colorsFragment.show(supportFragmentManager, colorsFragment.tag)
     }
@@ -390,6 +436,14 @@ class CameraActivity : BaseActivity() {
     } catch (e: Exception) {
         e.printStackTrace()
         (image_view.drawable as BitmapDrawable).bitmap
+    }
+
+    @Throws(IOException::class)
+    private fun createImageData(uri: Uri) {
+        val inputStream = contentResolver.openInputStream(uri)
+        inputStream?.buffered()?.use {
+            imageData = it.readBytes()
+        }
     }
 
     private fun insertData(kdWarna: String, kdPh: String?, katPh: String?){
@@ -431,5 +485,42 @@ class CameraActivity : BaseActivity() {
 
         requestQueue.cache.clear()
         requestQueue.add(jsonObjectRequest)
+    }
+
+    private fun uploadImage(kdWarna: String, kdPh: String?, katPh: String?) {
+        val url = "https://timurrayalab.com/salesapi/Input/uploadData"
+
+        val unique = System.currentTimeMillis()/1000
+
+        imageData?: return
+        val request = object : VolleyFileUploadRequest(
+            Method.POST,
+            url,
+            Response.Listener {
+                Log.d(CameraActivity::class.java.simpleName, "response is: $it")
+                hideLoading()
+                showDialog(currentColor.hex, kdPh, katPh)
+            },
+            Response.ErrorListener {
+                it.printStackTrace()
+                hideLoading()
+            }
+        ) {
+            override fun getByteData(): MutableMap<String, FileDataPart> {
+                val params = HashMap<String, FileDataPart>()
+                params["imageFile"] = FileDataPart("$unique.jpg", imageData!!, "jpg")
+                return params
+            }
+
+            override fun getParams(): MutableMap<String, String> {
+                val params = HashMap<String, String>()
+                params["id_user"] = prefManager.getIdUser().toString()
+                params["kode_warna"] = kdWarna
+                params["kode_ph"] = kdPh!!
+                params["kategori_ph"] = katPh!!
+                return params
+            }
+        }
+        Volley.newRequestQueue(this).add(request)
     }
 }

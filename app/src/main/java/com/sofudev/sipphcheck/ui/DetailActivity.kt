@@ -52,6 +52,11 @@ class DetailActivity : BaseActivity() {
 
     override fun initEvents() {
         prefManager = PrefManager(this)
+//        checkData()
+    }
+
+    override fun onResume() {
+        super.onResume()
         checkData()
     }
 

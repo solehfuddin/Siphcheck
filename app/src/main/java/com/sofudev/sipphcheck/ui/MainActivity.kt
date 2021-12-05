@@ -46,7 +46,7 @@ class MainActivity : BaseActivity() {
     override fun initEvents() {
         prefManager = PrefManager(this)
         checkLogin()
-        checkData()
+//        checkData()
 
         btn_cekph.setOnClickListener {
             val intent = Intent(this, CameraActivity::class.java)
@@ -64,6 +64,11 @@ class MainActivity : BaseActivity() {
 
             logoutApp()
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        checkData()
     }
 
     override fun getLayoutId(): Int = R.layout.activity_main

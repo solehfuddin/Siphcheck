@@ -166,6 +166,19 @@
             app:layout_constraintGuide_percent="0.3" />
 
         <ImageView
+            android:id="@+id/btn_pick_image"
+            android:layout_width="@dimen/_24sdp"
+            android:layout_height="@dimen/_24sdp"
+            android:layout_marginStart="16dp"
+            android:contentDescription="@string/app_name"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_images_outline"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/guideline_bottom2"
+            app:tint="@color/colorPrimary" />
+
+        <ImageView
             android:id="@+id/btn_pick_color"
             android:layout_width="@dimen/_48sdp"
             android:layout_height="@dimen/_48sdp"

@@ -11,6 +11,7 @@
         <entry key="app/src/main/res/layout/data_input_new.xml" value="0.25" />
         <entry key="app/src/main/res/layout/dialog_color_detail.xml" value="0.25" />
         <entry key="app/src/main/res/layout/dialog_date_range.xml" value="0.1322463768115942" />
+        <entry key="app/src/main/res/layout/dialog_loading.xml" value="0.335" />
         <entry key="app/src/main/res/layout/dialog_new_detail.xml" value="0.1322463768115942" />
       </map>
     </option>
